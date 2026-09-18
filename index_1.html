@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero Dirección Estratégica · UNIMINUTO Sede Tolima-Huila</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16324F; --accent:#E2962B; --teal:#2F7A6D;
+  --bg:#F3F5F8; --card:#fff; --line:#DDE3EA; --muted:#5B6B7C; --text:#1B2733;
+  --side:#0F2237;
+  --ap:#2F7A6D; --tol:#E8C547; --cap:#E2962B; --exc:#C8473B;
+  --ap-bg:#E3F1EE; --ap-tx:#1E5A4F;
+  --tol-bg:#FBF1CC; --tol-tx:#6B5300;
+  --cap-bg:#FBE3C4; --cap-tx:#8A4B00;
+  --exc-bg:#F8D9D5; --exc-tx:#8E2A20;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.45}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;color:var(--ink)}
+button{font:inherit;cursor:pointer}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:#fff;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px}
+.brand small{display:block;color:#9FB2C6;font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.brand h1{color:#fff;font-size:20px;line-height:1.2}
+.brand h1 span{color:var(--accent)}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{background:none;border:0;color:#C9D6E3;text-align:left;padding:11px 12px;border-radius:8px;display:flex;gap:10px;align-items:center;font-weight:500}
+.nav button .num{width:22px;height:22px;border-radius:6px;background:#1E3550;display:grid;place-items:center;font-size:12px;font-family:'Space Grotesk';flex:none}
+.nav button:hover{background:#162C45}
+.nav button[aria-selected=true]{background:#1E3A59;color:#fff}
+.nav button[aria-selected=true] .num{background:var(--accent);color:#1B2733}
+.nav button:focus-visible,.risk-btn:focus-visible,.seg button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.side-foot{margin-top:auto;font-size:12px;color:#8DA2B8}
+main{min-width:0;padding:28px 32px 48px;max-width:1180px;width:100%}
+.tabhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.tabhead h2{font-size:28px}
+.tabhead p{margin:4px 0 0;color:var(--muted)}
+.seg{display:inline-flex;background:#E4E9EF;border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:7px 14px;border-radius:8px;color:var(--muted);font-weight:500}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px #0002}
+.seglabel{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;text-align:right}
+.risk-sel{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.risk-btn{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-family:'Space Grotesk';font-weight:600;font-size:18px;color:var(--ink)}
+.risk-btn:hover{border-color:#B9C5D2}
+.risk-btn[aria-pressed=true]{border-color:var(--ink);box-shadow:0 2px 10px #16324F22}
+.risk-btn .k{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.risk-btn .t{font-family:'Space Grotesk';font-weight:600;color:var(--ink);font-size:16px;padding-right:20px}
+.risk-btn .dot{position:absolute;top:14px;right:14px;width:12px;height:12px;border-radius:50%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.risk-head{margin-bottom:16px}
+.risk-head .frente{font-size:12.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.risk-head h3{font-size:21px;margin:6px 0 12px;line-height:1.3}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{background:#EEF2F6;border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink)}
+.chip b{font-weight:600}
+.chip.crit-Alto{background:var(--cap-bg);color:var(--cap-tx)}
+.chip.crit-Moderado{background:var(--tol-bg);color:var(--tol-tx)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-family:'Space Grotesk';font-size:28px;font-weight:600;color:var(--ink);margin:2px 0}
+.kpi .s{font-size:13px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted);margin:22px 0 10px;align-items:center}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.sec-title{font-size:17px;margin-bottom:0}
+.kri{margin-bottom:12px}
+.kri-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.kri h4{font-family:'Space Grotesk';font-size:16.5px;margin:0;color:var(--ink);max-width:720px;line-height:1.3}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.b-ap{background:var(--ap-bg);color:var(--ap-tx)}.b-tol{background:var(--tol-bg);color:var(--tol-tx)}
+.b-cap{background:var(--cap-bg);color:var(--cap-tx)}.b-exc{background:var(--exc-bg);color:var(--exc-tx)}
+.b-na{background:#EEF2F6;color:var(--muted)}
+.kri-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin:8px 0 14px}
+.kri-meta b{color:var(--text);font-weight:500}
+.bar-row{margin:8px 0 4px}
+.bar-label{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.track-wrap{padding:16px 12px}
+.track{position:relative;height:14px;border-radius:7px;display:flex;overflow:visible}
+.track .z{height:100%}
+.track .z:first-child{border-radius:7px 0 0 7px}.track .z:last-child{border-radius:0 7px 7px 0}
+.z-ap{background:var(--ap)}.z-tol{background:var(--tol)}.z-cap{background:var(--cap)}.z-exc{background:var(--exc)}
+.mk{position:absolute;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);color:var(--ink);font:700 10px 'Space Grotesk';display:grid;place-items:center;z-index:2}
+.mk.p1{top:-16px}.mk.p2{top:8px}
+.mk.active{background:var(--ink);color:#fff}
+.mk::after{content:"";position:absolute;left:50%;width:2px;background:var(--ink);transform:translateX(-50%)}
+.mk.p1::after{top:100%;height:9px}.mk.p2::after{bottom:100%;height:9px}
+.metaline{position:absolute;top:-4px;height:22px;border-left:2px dashed #16324F99;z-index:1}
+.limits{font-size:12.5px;color:var(--muted)}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.ro{border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.ro.active{border-color:var(--ink);background:#F7F9FB}
+.ro .p{font-size:12px;color:var(--muted)}
+.ro .val{font-family:'Space Grotesk';font-weight:600;font-size:18px;color:var(--ink)}
+.ro .sub{font-size:12.5px;color:var(--muted)}
+details{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--ink);font-weight:500;font-size:13.5px}
+dl{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:10px 0 0;font-size:13.5px}
+dt{color:var(--muted)}dd{margin:0;white-space:pre-line}
+.note{background:#FFF8EA;border-left:3px solid var(--accent);padding:8px 12px;font-size:13px;border-radius:0 8px 8px 0;margin-top:10px}
+.wt{height:6px;background:#E4E9EF;border-radius:3px;width:90px;display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden}
+.wt i{display:block;height:100%;background:var(--teal)}
+.method{font-size:13px;color:var(--muted);margin-top:18px}
+.soon{display:grid;place-items:center;text-align:center;padding:64px 24px;color:var(--muted)}
+.soon h3{font-size:22px;margin-bottom:8px}
+.soon .ic{width:56px;height:56px;border-radius:14px;background:#E7EDF3;display:grid;place-items:center;font-size:26px;margin:0 auto 16px}
+[hidden]{display:none!important}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.risk-sel{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;height:auto;flex-direction:column;padding:16px;gap:12px}
+  .nav{flex-direction:row;overflow-x:auto}.nav button{white-space:nowrap}
+  .side-foot{display:none}
+  main{padding:20px 16px 40px}
+}
+@media(max-width:560px){.readouts{grid-template-columns:1fr}dl{grid-template-columns:1fr}.tabhead h2{font-size:23px}.kpi .v{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><small>UNIMINUTO · Sede Tolima-Huila</small><h1>Dirección <span>estratégica</span></h1></div>
+    <nav class="nav" role="tablist" aria-label="Secciones del tablero" id="nav"></nav>
+    <div class="side-foot">Fuente: Matriz de Riesgos Estratégicos 2026 · Controles detectivos (KRI)</div>
+  </aside>
+  <main>
+    <section id="tab-riesgos" role="tabpanel">
+      <div class="tabhead">
+        <div><h2>Tablero de Riesgos</h2><p>Riesgos estratégicos 2026 y sus controles detectivos (KRI)</p></div>
+        <div><span class="seglabel">Cuatrimestre a evaluar</span>
+          <div class="seg" id="seg"><button data-p="1" aria-pressed="false">I · Ene–Abr</button><button data-p="2" aria-pressed="true">II · May–Ago</button></div></div>
+      </div>
+      <div class="risk-sel" id="riskSel" role="group" aria-label="Riesgo estratégico"></div>
+      <div id="riskPanel"></div>
+    </section>
+    <section id="tab-pdi" role="tabpanel" hidden></section>
+    <section id="tab-plan" role="tabpanel" hidden></section>
+    <section id="tab-calidad" role="tabpanel" hidden></section>
+  </main>
+</div>
+<script>
+const DATA=[{"n": 1, "corto": "Talento humano", "frente": "Frente No. 1 Identidad misional y cultura M.D.", "riesgo": "Ausencia y pérdida de talento humano con las competencias requeridas para el logro de la misión.", "prob": 3, "imp": 3, "crit": "Alto", "gestora": "Jenny Marcela Hurtado", "cargo": "Coordinadora Gestión Humano", "kris": [{"nombre": "Resultados de la evaluación de desempeño colaboradores.", "objetivo": "Analizar el desempeño de colaboradores de la gestión administrativa y académica (anual) con el fin de identificar brechas y establecer un plan de mejora", "formula": "Número de colaboradores con desempeño insatisfactorio / Número de colaboradores evaluados durante el periodo de medición * 100", "periodicidad": "Anual", "unidad": "Porcentaje", "responsable": "Yessica Alejandra Silva Gutierrez - Analista Talento Humano", "creado": "2024-06-24", "peso": 0.25, "meta": 0, "notas": "La medición de este indicador se realiza de manera anual.\nPeso KRI: 25%", "desc": true, "notaTendencia": null, "bars": [{"label": null, "meta": 0, "ap": 0.03, "tol": 0.059, "cap": 0.06, "q1": 0, "q2": 0}]}, {"nombre": "Resultados de la evaluación de desempeño profesores.", "objetivo": "Analizar el desempeño de profesores (semestral y anual) con el fin de identificar brechas y establecer un plan de mejora", "formula": "Número de profesores con desempeño insatisfactorio / Número de profesores evaluados durante el periodo de medición * 100", "periodicidad": "Semestral", "unidad": "Promedio", "responsable": "Yessica Alejandra Silva Gutierrez - Analista Talento Humano", "creado": "2024-06-24", "peso": 0.25, "meta": 0, "notas": "La medición de este indicador se realiza de manera semestral.\nPeso KRI: 25%", "desc": true, "notaTendencia": null, "bars": [{"label": null, "meta": 0, "ap": 0.03, "tol": 0.059, "cap": 0.06, "q1": 0, "q2": 0}]}, {"nombre": "Índice de Rotación de Personal colaboradores", "objetivo": "Monitorear y reducir la rotación de colaboradores para mejorar la retención de empleados cualificados, minimizar los costos asociados con la contratación y la capacitación, y preservar el conocimiento institucional y la estabilidad organizacional", "formula": "Número de colaboradores que renunciaron durante el periodo de medición / Número de colaboradores activos durante el periodo * 100", "periodicidad": "Trimestral", "unidad": "Promedio", "responsable": "Andres Felipe Sedano Tovar - Analista Administracion Personal", "creado": "2024-06-24", "peso": 0.25, "meta": 0.0126, "notas": "Peso KRI: 25%", "desc": true, "notaTendencia": "El Excel indica «Ascendente», pero los límites (0–2 %, 2,1–3 %, 3,1 %) indican que un valor menor es mejor; se interpreta como descendente.", "bars": [{"label": null, "meta": 0.0126, "ap": 0.02, "tol": 0.03, "cap": 0.031, "q1": 0.0134, "q2": 0.0075}]}, {"nombre": "Índice de Rotación de Personal profesores", "objetivo": "Monitorear y reducir la rotación de profesores para mejorar la retención de empleados cualificados, minimizar los costos asociados con la contratación y la capacitación, y preservar el conocimiento institucional y la estabilidad organizacional", "formula": "Número de profesores que renunciaron durante el periodo de medición / Número de profesores activos durante el periodo * 100", "periodicidad": "Trimestral", "unidad": "Promedio", "responsable": "Andres Felipe Sedano Tovar - Analista Administracion Personal", "creado": "2024-06-24", "peso": 0.25, "meta": 0.011, "notas": "Peso KRI: 25%", "desc": true, "notaTendencia": "El Excel indica «Ascendente», pero los límites (0–2 %, 2,1–3 %, 3,1 %) indican que un valor menor es mejor; se interpreta como descendente.", "bars": [{"label": null, "meta": 0.011, "ap": 0.02, "tol": 0.03, "cap": 0.031, "q1": 0.0145, "q2": 0.0022}]}]}, {"n": 2, "corto": "Pertinencia académica", "frente": "Frente No. 2 Innovación académica calidad y experiencia vibrante", "riesgo": "Falta de pertinencia demostrada en los productos y servicios académicos ofertados con las necesidades del entorno.", "prob": 2, "imp": 3, "crit": "Alto", "gestora": "Maureen Jennifer Gutiérrez Rodríguez", "cargo": "Vic. Académica", "kris": [{"nombre": "Índice de actualización de programas basada en análisis de pertinencia y procesos de autoevaluación", "objetivo": "Monitorear la implementación efectiva de acciones de mejora, ajuste, transformación o cierre de la oferta académica, a partir de procesos de análisis de pertinencia, ciclo de vida y autoevaluación de programas.", "formula": "Número de programas que han sido actualizados, ajustados o sometidos a decisiones de transformación/cierre con base en análisis formal de pertinencia en el último año/Número de programas de la sede con registro activo *100", "periodicidad": "Cuatrimestral", "unidad": "Porcentaje", "responsable": "Maureen Jennifer Gutiérrez Rodríguez - Vicerrectora Académica", "creado": "2026-04-09", "peso": 0.5, "meta": 0.9, "notas": "Peso KRI: 50%", "desc": false, "notaTendencia": null, "bars": [{"label": null, "meta": 0.9, "ap": 0.9, "tol": 0.81, "cap": 0.7200000000000001, "q1": 0.9615384615384616, "q2": 1.6538461538461537}]}, {"nombre": "Nivel de incorporación de evidencias de pertinencia en la autoevaluación de programas", "objetivo": "Validar que los procesos de autoevaluación evidencien análisis documentado de tendencias del sector, empleabilidad, relación con actores externos e impacto de egresados, como insumos para la toma de decisiones de mejora.", "formula": "Avance del ciclo de autoevaluación de los programas", "periodicidad": "Cuatrimestral", "unidad": "Porcentaje", "responsable": "Maureen Jennifer Gutiérrez Rodríguez - Vicerrectora Académica", "creado": "2026-04-09", "peso": 0.5, "meta": 0.9, "notas": "Peso KRI: 50%", "desc": false, "notaTendencia": null, "bars": [{"label": null, "meta": 0.9, "ap": 0.9, "tol": 0.81, "cap": 0.7200000000000001, "q1": 1, "q2": 1}]}]}, {"n": 3, "corto": "Permanencia estudiantil", "frente": "Frente No. 2 Innovación académica calidad y experiencia vibrante", "riesgo": "Deterioro de la permanencia estudiantil.", "prob": 3, "imp": 3, "crit": "Alto", "gestora": "María Cristina Nieto Herrera", "cargo": "Coordinadora Bienestar Institucional", "kris": [{"nombre": "Porcentaje de población de estudiantes ausentes", "objetivo": "Medir el porcentaje de ausentismo semestral de los estudiantes en UNIMINUTO Sede Tolima-Huila", "formula": "(No. de estudiantes que no se matricularon en el semestre inmediatamente anterior al periodo de medición / No. de estudiantes matriculados en el semestre de medición) x 100", "periodicidad": "Semestral", "unidad": "Porcentaje", "responsable": "Maria Cristina Nieto - - Coordinadora Bienestar Asuntos Estudiantiles", "creado": "2023-03-31", "peso": 0.5, "meta": 0.125, "notas": "Peso KRI: 50%", "desc": true, "notaTendencia": null, "bars": [{"label": null, "meta": 0.125, "ap": 0.125, "tol": 0.1388888888888889, "cap": 0.15625, "q1": 0.1343, "q2": 0.1296}]}, {"nombre": "Porcentaje de población de estudiantes desertores", "objetivo": "Medir el porcentaje de deserción semestral de los estudiantes en UNIMINUTO Sede Tolima-Huila", "formula": "(No. de estudiantes que no se matricularon en los dos semestres inmediatamente anterior al periodo de medición / No. de estudiantes matriculados en el semestre de medición) x 100", "periodicidad": "Semestral", "unidad": "Porcentaje", "responsable": "Maria Cristina Nieto - - Coordinadora Bienestar Asuntos Estudiantiles", "creado": "2023-03-30", "peso": 0.5, "meta": 0.098, "notas": "Peso KRI: 50%", "desc": true, "notaTendencia": null, "bars": [{"label": null, "meta": 0.098, "ap": 0.098, "tol": 0.1088888888888889, "cap": 0.1225, "q1": 0.1061, "q2": 0.1073}]}]}, {"n": 4, "corto": "Sostenibilidad financiera", "frente": "Frente No. 8 Sostenibilidad financiera y Ecología integral", "riesgo": "Deterioro de la sostenibilidad financiera.", "prob": 2, "imp": 2, "crit": "Moderado", "gestora": "Joice Peña Otalora", "cargo": "Vic. Administrativa y Financiera", "kris": [{"nombre": "Porcentaje de cumplimiento de metas de matrículas y de ingresos de estudiantes nuevos y continuos", "objetivo": "Medir el avance de cumplimiento de las metas de ingresos por concepto de matrículas de estudiantes nuevos y continuos, lo que permite visualizar la sostenibilidad financiera futura de la sede.", "formula": "1. (Cantidad de estudiantes nuevos y continuos con matrícula financiera completa / meta de matrículas de estudiantes nuevos y continuos definidas para el periodo de medición) * 100\n2. (Ingresos de estudiantes nuevos y continuos con matrícula financiera completa / meta de Ingresos de estudiantes nuevos y continuos definidas para el periodo de medición) * 100", "periodicidad": "Semestral", "unidad": "Porcentaje", "responsable": "Joice Smith Peña Otalora - - Vicerrectora Administrativa Y Financiera", "creado": "2023-03-31", "peso": 0.25, "meta": 1, "notas": "Peso KRI: 20%", "desc": false, "notaTendencia": "Este KRI tiene dos mediciones (cantidad de matrículas e ingresos); el estado toma la peor de las dos.", "bars": [{"label": "Matrículas (cantidad)", "meta": 1, "ap": 1, "tol": 0.9, "cap": 0.8, "q1": 0.9204000000000001, "q2": 0.91}, {"label": "Ingresos por matrícula", "meta": 1, "ap": 1, "tol": 0.9, "cap": 0.8, "q1": 0.9213, "q2": 0.9}]}, {"nombre": "Porcentaje de participación de los ingresos diferentes de matrículas", "objetivo": "Medir el avance de la diversificación de ingresos de la rectoría, lo que permite visualizar su sostenibilidad financiera futura.", "formula": "(Ingresos diferentes de matrículas / ingresos netos) * 100", "periodicidad": "Trimestral", "unidad": "Porcentaje", "responsable": "Joice Smith Peña Otalora - - Vicerrectora Administrativa Y Financiera", "creado": "2023-03-31", "peso": 0.2, "meta": 0.17, "notas": "(Límite de Capacidad) \nEne-Abril (Con corte a marzo) \nProyectos: (247 millones / 1.900 millones) = 13% \nPeso KRI: 20%", "desc": false, "notaTendencia": null, "bars": [{"label": null, "meta": 0.17, "ap": 0.17, "tol": 0.15300000000000002, "cap": 0.136, "q1": 0.23, "q2": 0.18}]}, {"nombre": "Cumplimiento del EBITDA presupuestado", "objetivo": "Medir el margen operativo que proporciona una buena indicación de la evolución de la rentabilidad de la sede.", "formula": "EBITDA / Ingresos netos \n\n(Costos+Gastos) - (Depreciación+Amortización+Provisión)/ Ingresos  Netos", "periodicidad": "Cuatrimestral", "unidad": "Porcentaje", "responsable": "Joice Smith Peña Otalora - - Vicerrectora Administrativa Y Financiera", "creado": "2023-03-31", "peso": 0.25, "meta": 0.12, "notas": "Ene-Abril (Con corte a marzo) Meta: 9%, Apetito:9% , Tolerancia: 8,1%, Capacidad: 7,2%.\nMay-Ago (Con corte a julio) Meta: 11%, Apetito: 11%, Tolerancia: 9,9%, Capacidad: 8,8%.\nSep-Dic: Meta:12% , Apetito: 12%, Tolerancia: 10,8% , Capacidad: 9,6%.\nPeso KRI: 20%", "desc": false, "notaTendencia": "La meta cambia en cada cuatrimestre (9 % → 11 % → 12 %), por eso cada medición se evalúa contra su propio límite.", "bars": [{"label": "Cuatrimestre I · meta 9 %", "meta": 0.09, "ap": 0.09, "tol": 0.081, "cap": 0.072, "q1": 0.22, "q2": null}, {"label": "Cuatrimestre II · meta 11 %", "meta": 0.11, "ap": 0.11, "tol": 0.099, "cap": 0.088, "q1": null, "q2": 0.12}]}, {"nombre": "Porcentaje de participación de los costos que se tienen por concepto de mano de obra directa", "objetivo": "Monitorear los costos por concepto de mano de obra directa, para garantizar que se encuentran dentro del presupuesto.", "formula": "(Costos de mano de obra directa / ingresos netos) * 100", "periodicidad": "Trimestral", "unidad": "Porcentaje", "responsable": "Joice Smith Peña Otalora - - Vicerrectora Administrativa Y Financiera", "creado": "2023-03-31", "peso": 0.15, "meta": 0.33, "notas": "Peso KRI: 20%", "desc": true, "notaTendencia": null, "bars": [{"label": null, "meta": 0.33, "ap": 0.33, "tol": 0.3666666666666667, "cap": 0.4125, "q1": 0.3, "q2": 0.32}]}, {"nombre": "Porcentaje de participación de los costos y gastos que se tienen por concepto de mano de obra indirecta", "objetivo": "Monitorear los costos y gastos por concepto de mano de obra, para garantizar que se encuentran dentro del presupuesto.", "formula": "(Costos y gastos de mano de obra indirecta / ingresos netos) * 100", "periodicidad": "Trimestral", "unidad": "Porcentaje", "responsable": "Joice Smith Peña Otalora - - Vicerrectora Administrativa Y Financiera", "creado": "2023-03-31", "peso": 0.15, "meta": 0.27, "notas": "Peso KRI: 20%", "desc": true, "notaTendencia": null, "bars": [{"label": null, "meta": 0.27, "ap": 0.27, "tol": 0.3, "cap": 0.3375, "q1": 0.27, "q2": 0.29}]}]}];
+const TABS=[
+ {id:'riesgos',t:'Tablero de Riesgos'},
+ {id:'pdi',t:'Tablero de PDI',ic:'🎯',d:'Seguimiento al PDI «Transformación 2023-2030» y sus Frentes Estratégicos.'},
+ {id:'plan',t:'Plan de acción',ic:'🗂️',d:'Avance y cumplimiento del Plan de Acción 2026 por centro universitario.'},
+ {id:'calidad',t:'Calidad de procesos',ic:'✅',d:'Indicadores y resultados de calidad de los procesos de la Sede.'}
+];
+const ZN={0:['ap','Límite de Apetito'],1:['tol','Límite de Tolerancia'],2:['cap','Límite de Capacidad'],3:['exc','Supera Límite de Capacidad']};
+const fmt=v=>v==null?'—':(v*100).toLocaleString('es-CO',{maximumFractionDigits:2})+' %';
+const fmt1=v=>v.toLocaleString('es-CO',{minimumFractionDigits:2,maximumFractionDigits:2});
+let cur=0, per=2, tab='riesgos';
+
+function zone(b,v,desc){
+  if(v==null)return null;
+  if(desc) return v<=b.ap?0:v<=b.tol?1:v<=b.cap?2:3;
+  return v>=b.ap?0:v>=b.tol?1:v>=b.cap?2:3;
+}
+function kriStatus(k,p){ // worst over bars with a value
+  let w=null;
+  k.bars.forEach(b=>{const z=zone(b,b['q'+p],k.desc); if(z!=null) w=w==null?z:Math.max(w,z);});
+  return w;
+}
+const badge=z=>z==null?'<span class="badge b-na">Sin medición</span>':`<span class="badge b-${ZN[z][0]}">${ZN[z][1]}</span>`;
+
+function buildNav(){
+  const nav=document.getElementById('nav');
+  nav.innerHTML=TABS.map((t,i)=>`<button role="tab" data-t="${t.id}" aria-selected="${t.id===tab}"><span class="num">${i+1}</span>${t.t}</button>`).join('');
+  nav.onclick=e=>{const b=e.target.closest('button'); if(!b)return; tab=b.dataset.t;
+    nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===tab));
+    TABS.forEach(t=>document.getElementById('tab-'+t.id).hidden=t.id!==tab);
+    window.scrollTo({top:0});};
+  TABS.slice(1).forEach(t=>{document.getElementById('tab-'+t.id).innerHTML=
+    `<div class="tabhead"><div><h2>${t.t}</h2></div></div><div class="card soon"><div><div class="ic" aria-hidden="true">${t.ic}</div><h3>En construcción</h3><p>${t.d}<br>Esta pestaña se habilitará en la siguiente etapa.</p></div></div>`;});
+}
+
+function buildSel(){
+  document.getElementById('riskSel').innerHTML=DATA.map((r,i)=>`<button class="risk-btn" data-i="${i}" aria-pressed="${i===cur}">Riesgo ${r.n}</button>`).join('');
+}
+
+function barHTML(k,b){
+  const vals=[b.q1,b.q2].filter(v=>v!=null);
+  const mx=Math.max(...vals,0);
+  let max,zones;
+  if(k.desc){max=Math.max(b.cap*1.35,mx*1.1);zones=[['ap',0,b.ap],['tol',b.ap,b.tol],['cap',b.tol,b.cap],['exc',b.cap,max]];}
+  else{max=Math.max(b.ap*1.2,mx*1.05);zones=[['exc',0,b.cap],['cap',b.cap,b.tol],['tol',b.tol,b.ap],['ap',b.ap,max]];}
+  const pos=v=>Math.min(100,Math.max(0,v/max*100));
+  const z=zones.map(([c,a,e])=>`<div class="z z-${c}" style="width:${(e-a)/max*100}%"></div>`).join('');
+  const mk=[[1,b.q1],[2,b.q2]].filter(x=>x[1]!=null).map(([p,v])=>`<div class="mk p${p}${p===per?' active':''}" style="left:${pos(v)}%" title="Cuatrimestre ${p==1?'I':'II'}: ${fmt(v)}">${p==1?'I':'II'}</div>`).join('');
+  const ml=b.meta>0&&pos(b.meta)>1?`<div class="metaline" style="left:${pos(b.meta)}%" title="Meta ${fmt(b.meta)}"></div>`:'';
+  const lim=k.desc?`Límite de Apetito ≤ ${fmt(b.ap)} · Límite de Tolerancia ≤ ${fmt(b.tol)} · Límite de Capacidad ≤ ${fmt(b.cap)}`:`Límite de Apetito ≥ ${fmt(b.ap)} · Límite de Tolerancia ≥ ${fmt(b.tol)} · Límite de Capacidad ≥ ${fmt(b.cap)}`;
+  return `<div class="bar-row">${b.label?`<div class="bar-label">${b.label}</div>`:''}<div class="track-wrap"><div class="track" role="img" aria-label="${lim}">${z}${ml}${mk}</div></div><div class="limits">Meta ${fmt(b.meta)} · ${lim}</div></div>`;
+}
+
+function roHTML(k,p){
+  const z=kriStatus(k,p);
+  let val,sub='';
+  if(k.bars.length>1 && k.bars.every(b=>b['q'+p]!=null)){
+    val=k.bars.map(b=>fmt(b['q'+p])).join(' · ');
+    sub=k.bars.map(b=>b.label.split(' ')[0]).join(' · ');
+  } else {
+    const b=k.bars.find(b=>b['q'+p]!=null); val=b?fmt(b['q'+p]):'—';
+  }
+  return `<div class="ro${p===per?' active':''}"><div><div class="p">Cuatrimestre ${p==1?'I · Ene–Abr':'II · May–Ago'}</div><div class="val">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>${badge(z)}</div>`;
+}
+
+function kriHTML(k,i){
+  const z=kriStatus(k,per);
+  return `<article class="card kri">
+   <div class="kri-top"><h4>${k.nombre}</h4>${badge(z)}</div>
+   <div class="kri-meta"><span>Peso <b>${Math.round(k.peso*100)} %</b><span class="wt"><i style="width:${k.peso*100}%"></i></span></span>
+     <span>Periodicidad <b>${k.periodicidad}</b></span>
+     <span>${k.desc?'↓ <b>Menor es mejor</b>':'↑ <b>Mayor es mejor</b>'}</span></div>
+   ${k.bars.map(b=>barHTML(k,b)).join('')}
+   <div class="readouts">${roHTML(k,1)}${roHTML(k,2)}</div>
+   ${k.notaTendencia?`<div class="note">${k.notaTendencia}</div>`:''}
+   <details><summary>Ver definición del indicador</summary><dl>
+     <dt>Objetivo</dt><dd>${k.objetivo}</dd><dt>Fórmula de cálculo</dt><dd>${k.formula}</dd>
+     <dt>Unidad de medida</dt><dd>${k.unidad}</dd><dt>Responsable</dt><dd>${k.responsable}</dd>
+     <dt>Fecha de creación</dt><dd>${new Date(k.creado+'T12:00').toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'})}</dd></dl></details>
+  </article>`;
+}
+
+function renderRisk(){
+  const r=DATA[cur];
+  const zs=r.kris.map(k=>kriStatus(k,per)), cnt=z=>zs.filter(x=>x===z).length, N=r.kris.length;
+  const tile=(l,z)=>`<div class="kpi"><div class="l">${l}</div><div class="v">${cnt(z)} de ${N}</div><div class="s">Cuatrimestre ${per==1?'I':'II'}</div></div>`;
+  document.getElementById('riskPanel').innerHTML=`
+   <div class="card risk-head">
+     <div class="frente">${r.frente}</div>
+     <h3>${r.riesgo}</h3>
+     <div class="chips"><span class="chip">Probabilidad <b>${r.prob}</b></span><span class="chip">Impacto <b>${r.imp}</b></span>
+       <span class="chip crit-${r.crit}">Criticidad <b>${r.crit}</b></span>
+       <span class="chip">Gestora del riesgo: <b>${r.gestora}</b> · ${r.cargo}</span></div>
+   </div>
+   <div class="kpis">
+     ${tile('KRI dentro del Límite de Apetito',0)}${tile('KRI en Límite de Tolerancia',1)}${tile('KRI en Límite de Capacidad',2)}${cnt(3)?tile('KRI que superan el Límite de Capacidad',3):''}
+   </div>
+   <div class="legend"><h3 class="sec-title" style="margin-right:8px">Controles detectivos (KRI)</h3>
+     <span><i style="background:var(--ap)"></i>Límite de Apetito</span><span><i style="background:var(--tol)"></i>Límite de Tolerancia</span>
+     <span><i style="background:var(--cap)"></i>Límite de Capacidad</span><span><i style="background:var(--exc)"></i>Supera capacidad</span>
+     <span><b>I</b> / <b>II</b> = medición de cada cuatrimestre · línea punteada = meta</span></div>
+   ${r.kris.map(kriHTML).join('')}`;
+}
+function render(){buildSel();renderRisk();
+  document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.p===per));}
+document.getElementById('riskSel').onclick=e=>{const b=e.target.closest('.risk-btn');if(!b)return;cur=+b.dataset.i;render();};
+document.getElementById('seg').onclick=e=>{const b=e.target.closest('button');if(!b)return;per=+b.dataset.p;render();};
+buildNav();render();
+</script>
+</body>
+</html>
