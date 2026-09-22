@@ -107,6 +107,11 @@ dt{color:var(--muted)}dd{margin:0;white-space:pre-line}
 .soon{display:grid;place-items:center;text-align:center;padding:64px 24px;color:var(--muted)}
 .soon h3{font-size:22px;margin-bottom:8px}
 .soon .ic{width:56px;height:56px;border-radius:14px;background:#E7EDF3;display:grid;place-items:center;font-size:26px;margin:0 auto 16px}
+.embed-wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;height:calc(100vh - 190px);min-height:600px}
+.embed-wrap iframe{width:100%;height:100%;border:0;display:block}
+.embed-link{font-size:13px;color:var(--muted);margin:10px 2px 0}
+.embed-link a{color:var(--ink);font-weight:600;text-decoration:none;border-bottom:1px solid var(--line)}
+.embed-link a:hover{border-color:var(--ink)}
 [hidden]{display:none!important}
 @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.risk-sel{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
@@ -146,7 +151,7 @@ const DATA=[{"n": 1, "corto": "Talento humano", "frente": "Frente No. 1 Identida
 const TABS=[
  {id:'riesgos',t:'Tablero de Riesgos'},
  {id:'pdi',t:'Tablero de PDI',ic:'🎯',d:'Seguimiento al PDI «Transformación 2023-2030» y sus Frentes Estratégicos.'},
- {id:'plan',t:'Plan de acción',ic:'🗂️',d:'Avance y cumplimiento del Plan de Acción 2026 por centro universitario.'},
+ {id:'plan',t:'Plan de acción',ic:'🗂️',d:'Avance y cumplimiento del Plan de Acción 2026 por centro universitario.',url:'https://juangjaureguig.github.io/Plan_de_acci-n_2026_STH/'},
  {id:'calidad',t:'Calidad de procesos',ic:'✅',d:'Indicadores y resultados de calidad de los procesos de la Sede.'}
 ];
 const ZN={0:['ap','Límite de Apetito'],1:['tol','Límite de Tolerancia'],2:['cap','Límite de Capacidad'],3:['exc','Supera Límite de Capacidad']};
@@ -173,8 +178,16 @@ function buildNav(){
     nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===tab));
     TABS.forEach(t=>document.getElementById('tab-'+t.id).hidden=t.id!==tab);
     window.scrollTo({top:0});};
-  TABS.slice(1).forEach(t=>{document.getElementById('tab-'+t.id).innerHTML=
-    `<div class="tabhead"><div><h2>${t.t}</h2></div></div><div class="card soon"><div><div class="ic" aria-hidden="true">${t.ic}</div><h3>En construcción</h3><p>${t.d}<br>Esta pestaña se habilitará en la siguiente etapa.</p></div></div>`;});
+  TABS.slice(1).forEach(t=>{
+    const panel=document.getElementById('tab-'+t.id);
+    if(t.url){
+      panel.innerHTML=`<div class="tabhead"><div><h2>${t.t}</h2><p>${t.d}</p></div></div>
+        <div class="embed-wrap"><iframe src="${t.url}" title="${t.t}" loading="lazy"></iframe></div>
+        <p class="embed-link">¿No carga bien? <a href="${t.url}" target="_blank" rel="noopener">Ábrelo en una pestaña aparte ↗</a></p>`;
+    } else {
+      panel.innerHTML=`<div class="tabhead"><div><h2>${t.t}</h2></div></div><div class="card soon"><div><div class="ic" aria-hidden="true">${t.ic}</div><h3>En construcción</h3><p>${t.d}<br>Esta pestaña se habilitará en la siguiente etapa.</p></div></div>`;
+    }
+  });
 }
 
 function buildSel(){
